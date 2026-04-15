@@ -6,4 +6,5 @@ COPY . .
 
 RUN mvn clean package -DskipTests
 
-CMD ["java", "-jar", "target/*.jar"]
+# Find actual jar and run it
+CMD ["sh", "-c", "java -jar target/*.jar"]
