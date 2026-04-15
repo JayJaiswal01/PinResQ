@@ -1,0 +1,124 @@
+ 
+굧���������� PinResQ – Technology Stack 
+ 
+虞號虠虡虢 Frontend (Client Side) 
+ 
+React.js (JavaScript) 
+o 
+Used to build the user interface 
+o 
+Handles pages like Login, Dashboard, Map, etc. 
+ 
+HTML5 + CSS3 
+o 
+Structure and styling of UI 
+o 
+Responsive design 
+ 
+Axios 
+o 
+Handles API communication between frontend and backend 
+ 
+React Router DOM 
+o 
+Enables navigation between pages 
+ 
+Leaflet.js 
+o 
+Map integration using OpenStreetMap 
+o 
+Displays real-time accident locations with markers 
+ 
+ Backend (Server Side) 
+ 
+Java 
+o 
+Core programming language 
+ 
+Spring Boot 
+o 
+Backend framework to build REST APIs 
+o 
+Handles business logic and request processing 
+ 
+Spring Data JPA (Hibernate) 
+o 
+ORM tool for database interaction 
+----------------Page (0) Break----------------
+o 
+Converts Java objects ↔ database tables 
+ 
+녾녿놄놀놅놁놂놃놆 Database 
+ 
+MySQL 
+o 
+Stores user data and emergency reports 
+o 
+Structured relational database 
+ 
+꼏꼐 API Communication 
+ 
+REST APIs (JSON-based) 
+o 
+Connect frontend and backend 
+o 
+Data exchange in JSON format 
+ 
+艒 Map & Location Services 
+ 
+Browser Geolocation API 
+o 
+Fetches user's real-time location (latitude, longitude) 
+ 
+Leaflet + OpenStreetMap 
+o 
+Displays map and markers 
+o 
+Free alternative to Google Maps 
+ 
+껾껿꼀껽 Authentication (Current + Future) 
+ 
+Basic Authentication 
+o 
+Email + Password login system 
+ 
+(Future Upgrade) JWT Authentication 
+o 
+Secure token-based authentication 
+ 
+----------------Page (1) Break----------------
+����� Development Tools 
+ 
+Node.js + npm 
+o 
+Manage frontend dependencies 
+ 
+Maven 
+o 
+Build and run Spring Boot backend 
+ 
+MySQL Command Line / Workbench 
+o 
+Database management 
+ 
+념녑녒녓녔 Development Environment 
+ 
+Runs on: 
+o 
+Command Prompt / Terminal 
+o 
+Browser (localhost) 
+ 
+��� Architecture Summary 
+React (Frontend) 
+     ↓ 
+Axios (API Calls) 
+     ↓ 
+Spring Boot (Backend) 
+     ↓ 
+JPA / Hibernate 
+     ↓ 
+MySQL Database 
+ 
+ 
+----------------Page (2) Break----------------

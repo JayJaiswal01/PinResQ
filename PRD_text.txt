@@ -1,0 +1,284 @@
+ 
+굽굾굿궀 Product Requirements Document (PRD) 
+럤럥럦럧랿럨럩럪럫러 PinResQ – Geo-Verified Emergency Response System 
+ 
+1. ��� Product Overview 
+PinResQ is a web-based emergency response platform that enables users to report 
+accidents in real-time and allows nearby individuals to view and respond quickly using 
+location-based data and map visualization. 
+The system focuses on reducing emergency response time by leveraging geolocation, real-
+time reporting, and community participation. 
+ 
+2. 蚘蚓蚔蚕蚖蚗 Objectives 
+Primary Goals: 
+ 
+Enable instant accident reporting 
+ 
+Provide accurate GPS-based location tracking 
+ 
+Display incidents on a live interactive map 
+ 
+Reduce delay in emergency response 
+Success Criteria: 
+ 
+Report submission time < 5 seconds 
+ 
+Map load time < 3 seconds 
+ 
+Accurate location detection (>95%) 
+ 
+System uptime > 99% 
+ 
+3. 뢿룀룁룂룃룄 Problem Statement 
+ 
+Emergency services are often delayed 
+ 
+Lack of real-time reporting tools 
+----------------Page (0) Break----------------
+ 
+No visibility of nearby incidents 
+ 
+Bystanders are not eƯectively utilized 
+ 
+Fake or unclear reports reduce eƯiciency 
+ 
+4. 골곩곪곫곬 Solution Overview 
+PinResQ provides: 
+ 
+One-click emergency reporting 
+ 
+Automatic GPS location capture 
+ 
+Backend data storage and retrieval 
+ 
+Map-based visualization of incidents 
+ 
+Community visibility for faster response 
+ 
+5. 躽躾躿軀 Target Users 
+User Type  Description 
+General Users Report accidents 
+Nearby Users View and respond to incidents 
+Admin (future) Monitor system 
+ 
+6. 꼁 Core Features 
+6.1 User Authentication 
+ 
+Register with name, email, password 
+ 
+Secure login system 
+ 
+Basic session handling 
+ 
+6.2 Emergency Reporting 
+----------------Page (1) Break----------------
+ 
+Button-based reporting 
+ 
+Auto-fetch latitude & longitude 
+ 
+Store report in database 
+ 
+6.3 Map Visualization 
+ 
+Interactive map using Leaflet 
+ 
+Display markers for all reports 
+ 
+Click markers for details 
+ 
+6.4 Backend API System 
+ 
+REST APIs for communication 
+ 
+Handles report creation and retrieval 
+ 
+7. 膆껎껏 User Flow 
+1. User opens application 
+2. Logs in / registers 
+3. Navigates to dashboard 
+4. Clicks “Report Emergency” 
+5. Location is captured automatically 
+6. Data sent to backend 
+7. Stored in database 
+8. Map displays the report 
+9. Other users can view it 
+ 
+8. 굧���������� System Architecture 
+Frontend (React.js) 
+----------------Page (2) Break----------------
+       ↓ 
+REST API (Axios) 
+       ↓ 
+Backend (Spring Boot) 
+       ↓ 
+Database (MySQL) 
+ 
+9. 녾녿놄놀놅놁놂놃놆 Data Requirements 
+Users Table 
+ 
+id (Primary Key) 
+ 
+name 
+ 
+email 
+ 
+password 
+ 
+phone (optional) 
+ 
+Reports Table 
+ 
+id (Primary Key) 
+ 
+latitude 
+ 
+longitude 
+ 
+timestamp 
+ 
+user_id (Foreign Key) 
+ 
+10. 艒 API Requirements 
+Authentication APIs 
+ 
+POST /api/auth/register 
+ 
+POST /api/auth/login 
+----------------Page (3) Break----------------
+ 
+Report APIs 
+ 
+POST /api/reports/create 
+ 
+GET /api/reports/all 
+ 
+11. 虞號虠虡虢 UI/UX Requirements 
+Design Principles: 
+ 
+Clean and minimal UI 
+ 
+Mobile responsive 
+ 
+Easy navigation 
+Key Pages: 
+ 
+Login Page 
+ 
+Register Page 
+ 
+Dashboard 
+ 
+Report Page 
+ 
+Map Page 
+Color Scheme: 
+ 
+Red → Emergency 
+ 
+Blue → Trust 
+ 
+Green → Success 
+ 
+12.  Technical Requirements 
+Frontend: 
+ 
+React.js (JavaScript only) 
+ 
+Axios for API calls 
+ 
+React Router for navigation 
+----------------Page (4) Break----------------
+ 
+Leaflet for maps 
+ 
+Backend: 
+ 
+Java Spring Boot 
+ 
+RESTful APIs 
+ 
+MVC architecture 
+ 
+Database: 
+ 
+MySQL 
+ 
+13. 꼂꼃꼄 Security Requirements 
+ 
+Password encryption (BCrypt recommended) 
+ 
+Input validation 
+ 
+CORS configuration 
+ 
+Basic authentication handling 
+ 
+14.  Constraints 
+ 
+Requires internet connection 
+ 
+Depends on browser location permissions 
+ 
+Initial version does not include real-time updates 
+ 
+No native mobile app (web only) 
+ 
+15. ����� Testing Requirements 
+ 
+API testing (Postman or browser) 
+ 
+Frontend UI testing 
+ 
+Integration testing (frontend + backend) 
+----------------Page (5) Break----------------
+ 
+Location accuracy testing 
+ 
+16. 궧궨궩 Future Enhancements 
+ 
+JWT authentication 
+ 
+Image/video upload for verification 
+ 
+Real-time notifications (WebSockets) 
+ 
+Nearby volunteer detection (radius logic) 
+ 
+Admin dashboard 
+ 
+Mobile app (React Native) 
+ 
+17. 궬궨궭궮궯 KPIs (Key Performance Indicators) 
+ 
+Number of reports submitted 
+ 
+Average response time 
+ 
+Active users 
+ 
+Map interaction rate 
+ 
+18. 蛹蛻蛺 Conclusion 
+PinResQ is a scalable, real-world impactful web application that combines: 
+ 
+Location intelligence 
+ 
+Full-stack architecture 
+ 
+Community-driven response 
+It lays the foundation for a next-generation emergency response system. 
+ 
+膆 You can now use this PRD for: 
+ 
+궬궨궭궮궯 PPT / Presentation 
+----------------Page (6) Break----------------
+ 
+굽굾굿궀 Project Report 
+ 
+靔靕適遪靖遫靗靘静靚遬遭靛遮靜遯遰遱遲遳靝遴非 Development roadmap 
+ 
+��� AI prompts (code generation) 
+ 
+ 
+----------------Page (7) Break----------------
