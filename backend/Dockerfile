@@ -1,13 +1,9 @@
-# Use Java 17
-FROM openjdk:17-jdk-slim
+FROM maven:3.9.9-eclipse-temurin-17
 
-# Copy project
 WORKDIR /app
+
 COPY . .
 
-# Build
-RUN apt-get update && apt-get install -y maven
-RUN mvn clean install
+RUN mvn clean package -DskipTests
 
-# Run
 CMD ["java", "-jar", "target/*.jar"]
