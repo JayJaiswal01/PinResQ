@@ -7,6 +7,7 @@ import { ProfileScreen } from './pages/profile-screen';
 import { RewardsScreen } from './pages/rewards-screen';
 import { ReportAccidentScreen } from './pages/report-accident-screen';
 import { VerificationStatusScreen } from './pages/verification-status-screen';
+import { AdminPanel } from './pages/admin-panel';
 import { Layout } from './components/Layout';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,8 @@ export default function App() {
           path="/report/status" 
           element={<PrivateRoute><VerificationStatusScreen /></PrivateRoute>} 
         />
+
+        <Route path="/admin" element={<AdminPanel />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

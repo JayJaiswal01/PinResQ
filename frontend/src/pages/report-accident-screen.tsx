@@ -20,6 +20,36 @@ import { Label } from "@/components/ui/label";
 import { createReport } from "@/services/api";
 import { IncidentUpdateModal } from "@/components/IncidentUpdateModal";
 
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+
+// Fix leaflet default icon issue
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+function LocationPicker({ coords, onChange }: { coords: { lat: number; lng: number }; onChange: (lat: number, lng: number) => void }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    map.setView([coords.lat, coords.lng], 16);
+  }, [coords.lat, coords.lng, map]);
+
+  useMapEvents({
+    click(e) {
+      onChange(e.latlng.lat, e.latlng.lng);
+    },
+  });
+
+  return (
+    <Marker position={[coords.lat, coords.lng]} />
+  );
+}
+
 export function ReportAccidentScreen() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -88,7 +118,7 @@ export function ReportAccidentScreen() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white overflow-hidden pb-12">
+    <div className="min-h-full flex flex-col bg-white overflow-hidden">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 border-b">
         <div className="flex items-center gap-3 mb-4">
@@ -183,22 +213,32 @@ export function ReportAccidentScreen() {
             </div>
 
             {/* Map */}
-            <div className="relative w-full h-64 bg-gradient-to-br from-blue-100 to-green-100 rounded-2xl overflow-hidden shadow-md">
-              <div className="absolute inset-0 opacity-30">
-                <svg className="w-full h-full" viewBox="0 0 400 300">
-                  <path d="M 0 150 Q 100 100 200 150 T 400 150" stroke="#4B5563" strokeWidth="2" fill="none" />
-                  <path d="M 50 200 Q 150 180 250 190 T 400 200" stroke="#4B5563" strokeWidth="1.5" fill="none" />
-                </svg>
-              </div>
-              
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full">
-                <MapPin className="w-12 h-12 text-red-600 drop-shadow-lg" fill="currentColor" />
-              </div>
+            <div className="relative w-full h-64 bg-gray-100 rounded-2xl overflow-hidden shadow-md">
+              <MapContainer
+                center={[location.lat, location.lng]}
+                zoom={16}
+                zoomControl={false}
+                style={{ height: '100%', width: '100%', zIndex: 0 }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <LocationPicker 
+                  coords={{ lat: location.lat, lng: location.lng }} 
+                  onChange={(lat, lng) => setLocation({ 
+                    ...location, 
+                    lat, 
+                    lng, 
+                    address: "User Selected Point" 
+                  })} 
+                />
+              </MapContainer>
 
-              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md z-[1000]">
                 <div className="flex items-center gap-2">
                   <Navigation className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium">GPS Accuracy: High</span>
+                  <span className="text-sm font-medium">Click map to move pin</span>
                 </div>
               </div>
             </div>
@@ -387,7 +427,7 @@ export function ReportAccidentScreen() {
 
       {/* Footer buttons */}
       {!showUpdateModal && (
-        <div className="fixed bottom-0 mt-auto px-6 py-4 border-t bg-white w-full max-w-md">
+        <div className="sticky bottom-0 mt-auto border-t bg-white/95 px-6 py-4 backdrop-blur">
           <Button
             onClick={handleNext}
             disabled={(step === 1 && !videoUploaded) || isSubmitting}

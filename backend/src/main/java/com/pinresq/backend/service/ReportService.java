@@ -62,4 +62,11 @@ public class ReportService {
         return reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found with id: " + id));
     }
+
+    /** Update report status (Admin/Dispatch action) */
+    public Report updateReportStatus(Long reportId, String status) {
+        Report report = getReportById(reportId);
+        report.setStatus(status);
+        return reportRepository.save(report);
+    }
 }

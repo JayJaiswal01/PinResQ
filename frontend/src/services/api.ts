@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Client } from '@stomp/stompjs';
 
 const API = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: 'http://localhost:8088/api',
 });
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -14,6 +14,8 @@ export const createReport   = (data: any) => API.post('/reports/create', data);
 export const getAllReports  = ()          => API.get('/reports/all');
 export const getReportById  = (id: string | number) => API.get(`/reports/${id}`);
 export const getRecentReports = ()        => API.get('/reports/recent');
+export const updateReportStatus = (id: string | number, status: string) => 
+  API.patch(`/reports/${id}/status`, null, { params: { status } });
 
 // ── Updates ──────────────────────────────────────────────────────────────────
 export const postUpdate = (reportId: string | number, notes: string, image?: File) => {
@@ -37,7 +39,7 @@ export const respondToIncident = (reportId: string | number, volunteerId: string
 // ── WebSocket ────────────────────────────────────────────────────────────────
 export const setupWebSocket = (onConnect: () => void, onMessage: (msg: any) => void, userId?: string | number) => {
   const client = new Client({
-    brokerURL: 'ws://localhost:8080/ws',
+    brokerURL: 'ws://localhost:8088/ws',
     reconnectDelay: 5000,
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
