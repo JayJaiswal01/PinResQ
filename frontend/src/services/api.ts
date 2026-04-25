@@ -5,16 +5,27 @@ const API = axios.create({
   baseURL: 'http://localhost:8088/api',
 });
 
+// ── JWT Interceptor ───────────────────────────────────────────────────────────
+// Attach the stored JWT token to every request automatically
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // ── Auth ─────────────────────────────────────────────────────────────────────
 export const registerUser = (data: any) => API.post('/auth/register', data);
 export const loginUser    = (data: any) => API.post('/auth/login', data);
 
 // ── Reports ──────────────────────────────────────────────────────────────────
-export const createReport   = (data: any) => API.post('/reports/create', data);
-export const getAllReports  = ()          => API.get('/reports/all');
-export const getReportById  = (id: string | number) => API.get(`/reports/${id}`);
-export const getRecentReports = ()        => API.get('/reports/recent');
-export const updateReportStatus = (id: string | number, status: string) => 
+export const createReport      = (data: any) => API.post('/reports/create', data);
+export const getAllReports      = ()          => API.get('/reports/all');
+export const getReportById     = (id: string | number) => API.get(`/reports/${id}`);
+export const getRecentReports  = ()          => API.get('/reports/recent');
+export const getDashboardStats = ()          => API.get('/reports/stats');
+export const updateReportStatus = (id: string | number, status: string) =>
   API.patch(`/reports/${id}/status`, null, { params: { status } });
 
 // ── Updates ──────────────────────────────────────────────────────────────────
@@ -31,7 +42,7 @@ export const getUpdates = (reportId: string | number) => API.get(`/reports/${rep
 
 // ── Volunteers ───────────────────────────────────────────────────────────────
 export const toggleVolunteer = (userId: string | number) => API.put(`/volunteer/toggle/${userId}`);
-export const respondToIncident = (reportId: string | number, volunteerId: string | number, status: string) => 
+export const respondToIncident = (reportId: string | number, volunteerId: string | number, status: string) =>
   API.post('/volunteer/respond', null, {
     params: { reportId, volunteerId, status }
   });

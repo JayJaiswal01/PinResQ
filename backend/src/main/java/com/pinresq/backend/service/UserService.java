@@ -8,6 +8,7 @@ import com.pinresq.backend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,12 +35,13 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
         user.setVolunteerMode(false);
+        user.setRole("USER");
 
         User saved = userRepository.save(user);
         return toResponse(saved);
     }
 
-    /** Login: find user by email, compare BCrypt-hashed password */
+    /** Login: find user by email, compare BCrypt-hashed password, update lastLogin */
     public UserResponse loginUser(LoginRequest request) {
         Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
         if (userOpt.isEmpty()) {
@@ -50,6 +52,10 @@ public class UserService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
+
+        // ── Phase 4A: Track last login ──────────────────────────────────────
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
 
         return toResponse(user);
     }
@@ -73,13 +79,16 @@ public class UserService {
     }
 
     /** Convert User entity → UserResponse DTO (no password) */
-    private UserResponse toResponse(User user) {
+    public UserResponse toResponse(User user) {
         return new UserResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getPhone(),
-                user.getVolunteerMode()
+                user.getVolunteerMode(),
+                user.getRole(),
+                user.getCreatedAt(),
+                user.getLastLogin()
         );
     }
 }

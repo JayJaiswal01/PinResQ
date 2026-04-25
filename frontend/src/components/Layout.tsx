@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import { Bell, UserCircle, Menu } from "lucide-react";
 import { BottomNavigation, NavigationTab } from "./bottom-navigation";
 import { setupWebSocket } from "@/services/api";
 import { VolunteerAlertModal } from "./VolunteerAlertModal";
@@ -8,6 +9,7 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeAlert, setActiveAlert] = useState<any>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -28,7 +30,6 @@ export function Layout() {
 
   let activeTab: NavigationTab = "home";
   if (location.pathname.startsWith("/map")) activeTab = "map";
-  else if (location.pathname.startsWith("/rewards")) activeTab = "rewards";
   else if (location.pathname.startsWith("/profile")) activeTab = "profile";
 
   const handleTabChange = (tab: NavigationTab) => {
@@ -40,7 +41,7 @@ export function Layout() {
         navigate("/map");
         break;
       case "rewards":
-        navigate("/rewards");
+        navigate("/dashboard"); // No explicit rewards in PDF navigation list, routing to dashboard
         break;
       case "profile":
         navigate("/profile");
@@ -54,45 +55,80 @@ export function Layout() {
     window.open(url, "_blank");
   };
 
+  const desktopNavLinks = [
+    { label: "Home", path: "/dashboard" },
+    { label: "Report", path: "/report" },
+    { label: "Map", path: "/map" },
+    { label: "Resources", path: "/resources" },
+    { label: "About Us", path: "/about" },
+  ];
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),_transparent_32%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_45%,_#f8fafc_100%)]">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl items-stretch lg:gap-6 lg:px-6 lg:py-6">
-        <aside className="hidden lg:flex lg:w-[320px] xl:w-[360px] flex-col justify-between rounded-[32px] bg-white/40 border border-white/60 backdrop-blur-xl px-8 py-10 text-slate-900 shadow-2xl shadow-slate-950/5">
-          <div className="space-y-8">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-red-600">About PinResQ</p>
-              <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-950">Saving Lives Through Community & Tech.</h1>
-              <p className="mt-4 text-sm leading-6 text-slate-600">
-                PinResQ is a geo-verified emergency response platform that connects people in distress with nearby volunteers and professional emergency services.
-              </p>
+    <div className="min-h-screen bg-[#F8F9FA] flex flex-col font-sans">
+      {/* Desktop Top Navbar (Hidden on Mobile) */}
+      <header className="hidden lg:flex w-full h-20 bg-white shadow-sm px-8 items-center justify-between z-40 sticky top-0">
+        <div className="flex items-center gap-10">
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#C0392B] rounded flex items-center justify-center">
+              <span className="text-white font-bold text-xl leading-none">P</span>
             </div>
-
-            <div className="rounded-[28px] border border-white/70 bg-white/60 p-5 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Core Mission</p>
-              <ul className="mt-4 space-y-3 text-sm text-slate-700">
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-red-500" /> Reduce emergency response times</li>
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-red-500" /> Geo-verify every incident</li>
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-red-500" /> Empower local community volunteers</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="rounded-[28px] border border-blue-100 bg-blue-50/50 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">How it works</p>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              When you report an accident, we instantly alert nearby volunteers and broadcast the location to emergency dispatchers via WebSockets.
-            </p>
-          </div>
-        </aside>
-
-        <div className="flex min-h-screen flex-1 lg:min-h-0">
-          <div className="relative flex min-h-screen w-full flex-col bg-white lg:min-h-[calc(100vh-3rem)] lg:overflow-hidden lg:rounded-[32px] lg:border lg:border-slate-200/70 lg:shadow-2xl lg:shadow-slate-900/10">
-            <div className="flex-1 overflow-y-auto pb-[88px] lg:pb-0">
-              <Outlet />
-            </div>
-            <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
-          </div>
+            <span className="font-bold text-2xl text-[#2C3E50] tracking-tight">PINRESQ</span>
+          </Link>
+          
+          <nav className="flex items-center gap-8">
+            {desktopNavLinks.map(link => {
+              const isActive = link.path === location.pathname;
+              return (
+                <button 
+                  key={link.label}
+                  onClick={() => navigate(link.path)}
+                  className={`text-sm font-medium transition-colors hover:text-[#C0392B] ${
+                    isActive
+                      ? "text-[#C0392B] border-b-2 border-[#C0392B] pb-1"
+                      : "text-[#2C3E50]"
+                  }`}
+                >
+                  {link.label}
+                </button>
+              );
+            })}
+          </nav>
         </div>
+
+        <div className="flex items-center gap-6">
+          <button className="relative text-[#2C3E50] hover:text-[#C0392B] transition-colors">
+            <Bell className="w-6 h-6" />
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+          </button>
+          <button className="flex items-center gap-2 text-[#2C3E50] hover:text-[#C0392B] transition-colors" onClick={() => navigate('/profile')}>
+            <UserCircle className="w-8 h-8" />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Top Header (Hidden on Desktop) */}
+      <header className="lg:hidden w-full h-16 bg-white shadow-sm px-4 flex items-center justify-between z-40 sticky top-0">
+        <div className="flex items-center gap-3">
+          <button className="text-[#2C3E50]" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+        <Link to="/dashboard" className="font-bold text-xl text-[#2C3E50] tracking-tight absolute left-1/2 -translate-x-1/2">
+          PINRESQ
+        </Link>
+        <button className="relative text-[#2C3E50]">
+          <Bell className="w-6 h-6" />
+        </button>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-1 w-full max-w-7xl mx-auto pb-[90px] lg:pb-10 relative">
+        <Outlet />
+      </main>
+
+      {/* Mobile Sticky Bottom Nav (Hidden on Desktop) */}
+      <div className="lg:hidden">
+        <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
 
       <VolunteerAlertModal

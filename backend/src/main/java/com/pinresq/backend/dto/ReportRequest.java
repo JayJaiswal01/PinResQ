@@ -19,6 +19,11 @@ public class ReportRequest {
     private Boolean fireSmokePresent;
     private Boolean hasVideo;
 
+    // ── Phase 3B additions ────────────────────────────────────────────────────
+    private String type;             // "ACCIDENT" | "FIRE" | "MEDICAL" | "FLOOD" | "OTHER"
+    private String description;
+    private String priority;         // "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
+
     // ── Getters & Setters ────────────────────────────────────────────────────
     public Double getLatitude() { return latitude; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
@@ -40,4 +45,13 @@ public class ReportRequest {
 
     public Boolean getHasVideo() { return hasVideo; }
     public void setHasVideo(Boolean hasVideo) { this.hasVideo = hasVideo; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
 }

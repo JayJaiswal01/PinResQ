@@ -59,6 +59,12 @@ public class ReportController {
         return ResponseEntity.ok(incidentActionService.getUpdates(id));
     }
 
+    /** GET /api/reports/stats – live dashboard counts for home page */
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Object>> getStats() {
+        return ResponseEntity.ok(reportService.getStats());
+    }
+
     /** GET /api/reports/all – fetch all reports for the map */
     @GetMapping("/all")
     public ResponseEntity<List<Report>> getAllReports() {

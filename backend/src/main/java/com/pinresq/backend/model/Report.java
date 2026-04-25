@@ -23,31 +23,43 @@ public class Report {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    // ── New fields from 4-step wizard ───────────────────────────────────────
+    // ── Wizard step fields ───────────────────────────────────────────────────
     @Column(nullable = true)
     private String severity;          // "Minor" | "Moderate" | "Severe"
 
     @Column(name = "vehicles_involved", nullable = true)
-    private Integer vehiclesInvolved; // numeric count
+    private Integer vehiclesInvolved;
 
     @Column(name = "fire_smoke_present", nullable = true)
-    private Boolean fireSmokePresent; // true / false
+    private Boolean fireSmokePresent;
 
     @Column(name = "has_video", nullable = true)
-    private Boolean hasVideo;         // true if user attached video
+    private Boolean hasVideo;
 
     @Column(nullable = false)
-    private String status;            // RECEIVED | VERIFYING | DISPATCHED | EN_ROUTE
+    private String status;            // RECEIVED | VERIFYING | DISPATCHED | EN_ROUTE | RESOLVED
+
+    // ── Phase 3B additions ────────────────────────────────────────────────────
+    @Column(nullable = true)
+    private String type;              // "ACCIDENT" | "FIRE" | "MEDICAL" | "FLOOD" | "OTHER"
+
+    @Column(columnDefinition = "TEXT", nullable = true)
+    private String description;
+
+    @Column(nullable = true)
+    private String priority;          // "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
 
     // ── Lifecycle ────────────────────────────────────────────────────────────
     @PrePersist
     public void prePersist() {
         this.timestamp = LocalDateTime.now();
-        if (this.status == null) this.status = "RECEIVED";
-        if (this.hasVideo == null) this.hasVideo = false;
+        if (this.status == null)           this.status = "RECEIVED";
+        if (this.hasVideo == null)         this.hasVideo = false;
         if (this.fireSmokePresent == null) this.fireSmokePresent = false;
         if (this.vehiclesInvolved == null) this.vehiclesInvolved = 1;
-        if (this.severity == null) this.severity = "Moderate";
+        if (this.severity == null)         this.severity = "Moderate";
+        if (this.type == null)             this.type = "ACCIDENT";
+        if (this.priority == null)         this.priority = "MEDIUM";
     }
 
     // ── Constructors ─────────────────────────────────────────────────────────
@@ -83,4 +95,13 @@ public class Report {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
 }

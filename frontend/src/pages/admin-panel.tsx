@@ -109,14 +109,35 @@ export function AdminPanel() {
                       </div>
 
                       <div className="p-6 md:flex-1 bg-white">
-                        <div className="flex items-start gap-3 mb-4">
-                          <MapPin className="w-5 h-5 mt-1 text-slate-400" />
-                          <div>
-                            <p className="text-xs uppercase text-slate-400 font-bold">Location</p>
-                            <p className="text-slate-900">{report.latitude.toFixed(6)}, {report.longitude.toFixed(6)}</p>
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="flex-1">
+                            <Badge variant="outline" className={`mb-2 font-bold ${
+                              report.priority === 'CRITICAL' ? 'border-red-500 text-red-600' :
+                              report.priority === 'HIGH' ? 'border-orange-500 text-orange-600' :
+                              'border-slate-300 text-slate-600'
+                            }`}>
+                              Priority: {report.priority || 'MEDIUM'}
+                            </Badge>
+                            <div className="flex items-start gap-3 mt-1">
+                              <MapPin className="w-5 h-5 mt-1 text-slate-400 flex-shrink-0" />
+                              <div>
+                                <p className="text-xs uppercase text-slate-400 font-bold">Location</p>
+                                <p className="text-slate-900">{report.latitude.toFixed(6)}, {report.longitude.toFixed(6)}</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+                        
+                        <div className="bg-slate-50 rounded-lg p-3 mb-4">
+                           <p className="text-xs uppercase text-slate-400 font-bold mb-1">Description</p>
+                           <p className="text-sm text-slate-700">{report.description || 'No description provided.'}</p>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4 text-sm mb-2">
+                          <div className="bg-slate-50 p-2 rounded">
+                            <p className="text-slate-400 text-[10px] uppercase font-bold">Type</p>
+                            <p className="font-semibold">{report.type || 'ACCIDENT'}</p>
+                          </div>
                           <div className="bg-slate-50 p-2 rounded">
                             <p className="text-slate-400 text-[10px] uppercase font-bold">Vehicles</p>
                             <p className="font-semibold">{report.vehiclesInvolved || 0}</p>

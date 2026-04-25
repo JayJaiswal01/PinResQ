@@ -1,5 +1,6 @@
 package com.pinresq.backend.controller;
 
+import com.pinresq.backend.config.JwtUtil;
 import com.pinresq.backend.dto.LoginRequest;
 import com.pinresq.backend.dto.RegisterRequest;
 import com.pinresq.backend.dto.UserResponse;
@@ -17,10 +18,12 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     /** POST /api/auth/register */
@@ -28,8 +31,10 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
             UserResponse user = userService.registerUser(request);
+            String token = jwtUtil.generateToken(user.getEmail());
             return ResponseEntity.ok(Map.of(
                     "message", "Registration successful",
+                    "token", token,
                     "user", user
             ));
         } catch (RuntimeException e) {
@@ -42,8 +47,10 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             UserResponse user = userService.loginUser(request);
+            String token = jwtUtil.generateToken(user.getEmail());
             return ResponseEntity.ok(Map.of(
                     "message", "Login successful",
+                    "token", token,
                     "user", user
             ));
         } catch (RuntimeException e) {

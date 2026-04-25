@@ -78,9 +78,14 @@ export function ProfileScreen() {
           </div>
           <div>
             <h3 className="text-xl font-bold mb-1">{userName}</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Shield className="w-4 h-4 text-green-600" />
-              <span>Verified Citizen</span>
+            <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+              <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                {localStorage.getItem('userRole') || 'USER'}
+              </Badge>
+              <div className="flex items-center gap-1">
+                <Shield className="w-4 h-4 text-green-600" />
+                <span>Verified</span>
+              </div>
             </div>
           </div>
         </div>

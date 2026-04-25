@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -22,12 +22,14 @@ export function LoginPage() {
     setLoading(true);
     try {
       const res = await loginUser(form);
-      const { user } = res.data;
+      const { user, token } = res.data;
+      localStorage.setItem('token', token);
       localStorage.setItem('userId', user.id);
       localStorage.setItem('userName', user.name);
       localStorage.setItem('userEmail', user.email);
       localStorage.setItem('userPhone', user.phone || '');
       localStorage.setItem('volunteerMode', user.volunteerMode);
+      localStorage.setItem('userRole', user.role || 'USER');
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed. Please try again.');

@@ -1,195 +1,184 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle, Download, MapPin, Users, Navigation, Clock, ChevronRight, Monitor, Smartphone } from "lucide-react";
+import { Phone, Users, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { toggleVolunteer, getAllReports, setupWebSocket } from "@/services/api";
+import { getDashboardStats, setupWebSocket } from "@/services/api";
+import { FactCarousel } from "@/components/FactCarousel";
 
 export function HomeScreen() {
   const navigate = useNavigate();
-  const [volunteerMode, setVolunteerMode] = useState(false);
-  const [recentIncidents, setRecentIncidents] = useState<any[]>([]);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [installHelpVisible, setInstallHelpVisible] = useState(false);
+  const [stats, setStats] = useState({
+    activeCount: 0,
+    resolvedToday: 0,
+    totalVolunteers: 0,
+    avgResponseMinutes: 0
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  const fetchStats = async () => {
+    try {
+      const res = await getDashboardStats();
+      setStats(res.data);
+    } catch (e) {
+      console.error("Failed to fetch stats", e);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   useEffect(() => {
-    const isVolunteer = localStorage.getItem('volunteerMode') === 'true';
-    setVolunteerMode(isVolunteer);
-
-    getAllReports().then(res => {
-      setRecentIncidents(res.data.slice(0, 5));
-    });
-
+    fetchStats();
     const client = setupWebSocket(
       () => {},
       (data) => {
-        if (!data.isAlert) {
-          setRecentIncidents(prev => [data, ...prev].slice(0, 5));
-        }
+        if (!data.isAlert) fetchStats(); 
       }
     );
-
     return () => {
       client.deactivate();
     };
   }, []);
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setDeferredPrompt(event);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-  }, []);
-
-  const handleToggleVolunteerMode = async (enabled: boolean) => {
-    setVolunteerMode(enabled);
-    localStorage.setItem('volunteerMode', String(enabled));
-    const userId = localStorage.getItem('userId');
-    if (userId) {
-      try {
-        await toggleVolunteer(userId);
-      } catch (e) {
-        console.error("Failed to toggle volunteer mode via API", e);
-      }
-    }
-  };
-
-  const handleInstall = async () => {
-    if (deferredPrompt) {
-      (deferredPrompt as any).prompt();
-      await (deferredPrompt as any).userChoice?.catch(() => undefined);
-      setDeferredPrompt(null);
-      return;
-    }
-
-    setInstallHelpVisible(true);
-  };
-
   return (
-    <div className="min-h-full bg-gradient-to-b from-blue-50 via-white to-slate-50">
-      <div className="mx-auto w-full max-w-5xl px-4 pt-6 pb-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="mb-1 text-2xl font-bold text-gray-900 sm:text-3xl">PinResQ</h1>
-            <p className="text-sm text-gray-600">Emergency Response System</p>
+    <div className="w-full pt-6 px-4 lg:px-8">
+      
+      {/* Top Hero + Fact Carousel Row */}
+      <div className="flex flex-col lg:flex-row gap-6 mb-8">
+        {/* Left: Hero block */}
+        <div className="flex-1 flex flex-col justify-center gap-6 lg:gap-8 bg-white p-8 lg:p-10 rounded-[28px] border border-gray-100 shadow-sm">
+          <div className="space-y-4">
+            <h1 className="text-4xl lg:text-5xl font-bold text-[#2C3E50] leading-[1.15] tracking-tight">
+              Smart Emergency Response. <br className="hidden lg:block"/>
+              <span className="text-[#C0392B]">Stronger Communities.</span>
+            </h1>
+            <p className="text-lg text-gray-500 max-w-lg leading-relaxed">
+              When every second counts, PinResQ ensures your emergency reaches the right people instantly. 
+            </p>
           </div>
-          <Badge className={`${volunteerMode ? "bg-green-600" : "bg-gray-400"} text-white transition-colors`}>
-            {volunteerMode ? "Active" : "Standby"}
-          </Badge>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button
+              onClick={() => navigate('/report')}
+              className="h-14 px-8 rounded-full bg-[#C0392B] hover:bg-red-800 text-white text-lg font-bold shadow-lg shadow-red-500/20"
+            >
+              Report Emergency
+            </Button>
+            <Button
+              onClick={() => navigate('/map')}
+              variant="outline"
+              className="h-14 px-8 rounded-full border-2 border-[#2C3E50] text-[#2C3E50] hover:bg-[#2C3E50] hover:text-white text-lg font-bold"
+            >
+              View Live Map
+            </Button>
+          </div>
         </div>
 
-        <div className="grid gap-4">
-          <Card className="border-green-100 bg-white/80 p-4 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-full bg-green-100 p-2.5">
-                  <Users className="h-5 w-5 text-green-700" />
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">Volunteer Mode</p>
-                  <p className="text-xs text-gray-500">Receive nearby alerts</p>
-                </div>
-              </div>
-              <Switch
-                checked={volunteerMode}
-                onCheckedChange={handleToggleVolunteerMode}
-                className="data-[state=checked]:bg-green-600"
-              />
+        {/* Right: Fact Carousel */}
+        <div className="w-full lg:w-[450px]">
+          <div className="h-full bg-white rounded-[28px] border border-gray-100 shadow-sm p-6 flex flex-col">
+            <h3 className="text-[#C0392B] text-sm font-bold tracking-widest uppercase mb-4 text-center">DID YOU KNOW?</h3>
+            <div className="flex-1">
+              <FactCarousel />
             </div>
-          </Card>
+          </div>
         </div>
       </div>
 
-      <div className="mx-auto grid w-full max-w-5xl gap-6 px-4 pb-6 sm:px-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:px-8">
-        <div className="cursor-pointer" onClick={() => navigate('/map')}>
-          <div className="group relative h-52 w-full overflow-hidden rounded-[28px] bg-gradient-to-br from-blue-100 to-green-100 shadow-md sm:h-60">
-            <div className="absolute inset-0 opacity-30">
-              <svg className="h-full w-full" viewBox="0 0 400 200">
-                <path d="M 0 100 Q 100 50 200 100 T 400 100" stroke="#4B5563" strokeWidth="2" fill="none" />
-                <path d="M 50 150 Q 150 120 250 140 T 400 150" stroke="#4B5563" strokeWidth="1.5" fill="none" />
-              </svg>
-            </div>
-
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform transition-transform group-hover:scale-110">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-blue-500 opacity-75 animate-ping" />
-                <div className="relative rounded-full bg-blue-600 p-3 shadow-lg">
-                  <Navigation className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="flex items-center justify-between rounded-lg bg-white/95 px-3 py-2 shadow-md backdrop-blur-sm transition-colors group-hover:bg-blue-50">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-semibold text-gray-800">Explore Nearby Incidents</span>
-                </div>
-                <ChevronRight className="h-4 w-4 text-gray-400" />
-              </div>
-            </div>
-          </div>
+      {/* Volunteer CTA Row */}
+      <div className="w-full bg-[#2C3E50] rounded-[28px] p-6 lg:p-8 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative">
+        <div className="absolute right-0 top-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+        <div className="relative z-10 text-center sm:text-left">
+          <h2 className="text-2xl font-bold text-white mb-2">Be a Hero in Someone's Story</h2>
+          <p className="text-blue-100 text-base max-w-2xl">
+            Join our network of verified volunteers and get notified when an emergency occurs near you. Your quick response can make the ultimate difference.
+          </p>
         </div>
-
-        <div>
-          <Button
-            onClick={() => navigate('/report')}
-            className="h-full min-h-24 w-full rounded-[28px] border-0 bg-gradient-to-r from-red-600 to-red-700 text-white shadow-xl shadow-red-500/30 transition-all hover:scale-[1.01] hover:from-red-700 hover:to-red-800 active:scale-[0.99]"
-            size="lg"
+        <div className="relative z-10 shrink-0 w-full sm:w-auto">
+          <Button 
+            onClick={() => navigate('/profile')} 
+            className="w-full sm:w-auto h-12 px-6 rounded-full bg-white text-[#2C3E50] hover:bg-gray-100 font-bold"
           >
-            <div className="flex flex-col items-center gap-2 py-2">
-              <AlertCircle className="h-9 w-9" />
-              <span className="text-xl font-bold tracking-tight">REPORT ACCIDENT</span>
-            </div>
+            Join as Volunteer
           </Button>
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-5xl px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-900">Live Incident Feed</h3>
-          <Badge variant="outline" className="text-[10px] animate-pulse">LIVE UPDATES</Badge>
+      {/* Bottom Section: Stats & Safety grid */}
+      <div className="flex flex-col lg:flex-row gap-6 mb-12">
+        {/* Live Stats */}
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-4 px-1">
+            <h3 className="text-xl font-bold text-[#2C3E50]">Live Overview</h3>
+            <Badge className="bg-green-100 text-green-800 border border-green-200">System Online</Badge>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="rounded-[20px] bg-white border border-gray-100 p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-full bg-red-50 text-red-600">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <p className="text-sm font-semibold text-gray-500 line-clamp-1">Active Incidents</p>
+              </div>
+              <p className="text-3xl font-bold text-[#2C3E50]">{loadingStats ? "..." : stats.activeCount}</p>
+            </Card>
+
+            <Card className="rounded-[20px] bg-white border border-gray-100 p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-full bg-blue-50 text-blue-600">
+                  <Users className="w-5 h-5" />
+                </div>
+                <p className="text-sm font-semibold text-gray-500 line-clamp-1">Active Volunteers</p>
+              </div>
+              <p className="text-3xl font-bold text-[#2C3E50]">{loadingStats ? "..." : stats.totalVolunteers}</p>
+            </Card>
+
+            <Card className="rounded-[20px] bg-white border border-gray-100 p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-full bg-green-50 text-green-600">
+                  <CheckCircle className="w-5 h-5" />
+                </div>
+                <p className="text-sm font-semibold text-gray-500 line-clamp-1">Resolved Today</p>
+              </div>
+              <p className="text-3xl font-bold text-[#2C3E50]">{loadingStats ? "..." : stats.resolvedToday}</p>
+            </Card>
+
+            <Card className="rounded-[20px] bg-white border border-gray-100 p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-full bg-yellow-50 text-yellow-600">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <p className="text-sm font-semibold text-gray-500 line-clamp-1">Avg. Response Time</p>
+              </div>
+              <p className="text-3xl font-bold text-[#2C3E50]">{loadingStats ? "..." : `${stats.avgResponseMinutes} min`}</p>
+            </Card>
+          </div>
         </div>
 
-        <div className="space-y-3">
-          {recentIncidents.length === 0 ? (
-            <div className="rounded-xl border border-gray-100 bg-gray-50 p-6 text-center">
-              <p className="text-sm text-gray-400">No active incidents nearby</p>
-            </div>
-          ) : (
-            recentIncidents.map((incident) => (
-              <Card
-                key={incident.id}
-                className="group cursor-pointer border-0 bg-white p-3 shadow-sm transition-colors hover:bg-red-50"
-                onClick={() => navigate('/map')}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-red-100 p-2 transition-colors group-hover:bg-red-200">
-                    <AlertCircle className="h-5 w-5 text-red-600" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between">
-                      <p className="truncate text-sm font-bold text-gray-900">Incident #{incident.id}</p>
-                      <div className="flex items-center text-[10px] text-gray-500">
-                        <Clock className="mr-1 h-3 w-3" />
-                        {new Date(incident.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    </div>
-                    <p className="mt-0.5 truncate text-xs text-gray-600">
-                      {incident.severity} • {incident.latitude.toFixed(3)}, {incident.longitude.toFixed(3)}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            ))
-          )}
+        {/* Safety Tips */}
+        <div className="w-full lg:w-80">
+          <h3 className="text-xl font-bold text-[#2C3E50] mb-4 px-1">Safety Advice</h3>
+          <Card className="rounded-[24px] bg-[#FFF5F5] border border-red-100 p-6 h-[calc(100%-44px)] shadow-sm">
+            <h4 className="font-bold text-[#C0392B] mb-3">During an Emergency:</h4>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
+                <span className="text-sm text-red-900/80 leading-relaxed">Stay calm and ensure your own safety first before helping others.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
+                <span className="text-sm text-red-900/80 leading-relaxed">Do not move critically injured victims unless there is immediate hazard.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
+                <span className="text-sm text-red-900/80 leading-relaxed">Use PinResQ to instantly ping nearby verified responders.</span>
+              </li>
+            </ul>
+          </Card>
         </div>
       </div>
+
     </div>
   );
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -39,6 +40,23 @@ public class User {
     @Column(name = "last_lng", nullable = true)
     private Double lastLng;
 
+    // ── Phase 3A additions ────────────────────────────────────────────────────
+    @Column(nullable = false)
+    private String role = "USER";
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "last_login", nullable = true)
+    private LocalDateTime lastLogin;
+
+    // ── Lifecycle ────────────────────────────────────────────────────────────
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        if (this.role == null) this.role = "USER";
+    }
+
     // ── Constructors ─────────────────────────────────────────────────────────
     public User() {}
 
@@ -72,4 +90,13 @@ public class User {
 
     public Double getLastLng() { return lastLng; }
     public void setLastLng(Double lastLng) { this.lastLng = lastLng; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getLastLogin() { return lastLogin; }
+    public void setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; }
 }
